@@ -69,6 +69,22 @@ impl<T> PromptExtractor<T>  where T: Terminal {
 }
 
 #[test]
+fn check_no_arguments() {
+    
+    use super::*;
+    use std::vec::IntoIter;
+    
+    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
+        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
+    }
+
+    let args= extract_query_into_iter("");
+    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+
+    assert!(config.is_err());
+}
+
+#[test]
 fn check_arguments() {
     
     use super::*;
