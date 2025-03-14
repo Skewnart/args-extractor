@@ -1,16 +1,13 @@
-use std::io::{self, BufRead};
+use std::{collections::HashMap, io::{self, BufRead}};
 use crate::stdin::Terminal;
 
-pub struct Parameter {
-    pub name: String,
-    pub arguments: Vec<String>
-}
+type Parameters = HashMap<String, Vec<String>>;
 
 pub struct Prompt {
     pub program_name: String,
     pub content_piped: Option<String>,
     pub arguments: Option<Vec<String>>,
-    pub parameters: Option<Vec<Parameter>>,
+    pub parameters: Option<Parameters>,
 }
 
 pub struct PromptExtractor<T> where T: Terminal {
@@ -38,31 +35,28 @@ impl<T> PromptExtractor<T>  where T: Terminal {
         };
 
         let mut _arguments: Vec<String> = vec![];
-        let mut _parameters: Vec<Parameter> = vec![];
+        let mut _parameters: Parameters = HashMap::new();
 
-        let mut current_parameter: Option<Parameter> = None;
+        let mut current_parameter: Option<(String, Vec<String>)> = None;
 
         for arg in args {
             if arg.starts_with("-") {
                 if let Some(parameter) = current_parameter {
-                    _parameters.push(parameter);
+                    _parameters.insert(parameter.0, parameter.1);
                 }
 
-                current_parameter = Some(Parameter {
-                    name: arg,
-                    arguments: Vec::<String>::new()
-                });
+                current_parameter = Some((arg, Vec::<String>::new()));
             }
             else {
                 match current_parameter {
                     None => { _arguments.push(arg); },
-                    Some(ref mut parameter) => {parameter.arguments.push(arg);}
+                    Some(ref mut parameter) => {parameter.1.push(arg);}
                 }
             }
         }
 
         if let Some(parameter) = current_parameter {
-            _parameters.push(parameter);
+            _parameters.insert(parameter.0, parameter.1);
         }
 
         Ok(Prompt{
