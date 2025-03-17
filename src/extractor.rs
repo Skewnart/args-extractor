@@ -1,19 +1,12 @@
 use std::{collections::HashMap, io::{self, BufRead}};
-use crate::stdin::Terminal;
-
-type Parameters = HashMap<String, Vec<String>>;
-
-pub struct Prompt {
-    pub program_name: String,
-    pub content_piped: Option<String>,
-    pub arguments: Option<Vec<String>>,
-    pub parameters: Option<Parameters>,
-}
+use crate::{prompt::{Parameters, Prompt}, stdin::Terminal};
 
 pub struct PromptExtractor<T> where T: Terminal {
     terminal_service : T
 }
+
 impl<T> PromptExtractor<T>  where T: Terminal {
+
     pub fn new (_terminal_service : T) -> Self {
         Self {
             terminal_service : _terminal_service
@@ -68,123 +61,90 @@ impl<T> PromptExtractor<T>  where T: Terminal {
     }
 }
 
+#[cfg(test)]
+use crate::stdin::StdinServiceMock;
+#[cfg(test)]
+use std::vec::IntoIter;
+#[cfg(test)]
+fn extract_query_into_iter(input: &str) -> IntoIter<String> {
+    input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
+}
+
 #[test]
 fn check_no_arguments() {
-    
-    use super::*;
-    use std::vec::IntoIter;
-    
-    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
-        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
-    }
 
     let args= extract_query_into_iter("");
-    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+    let prompt = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
 
-    assert!(config.is_err());
+    assert!(prompt.is_err());
 }
 
 #[test]
 fn check_arguments() {
-    
-    use super::*;
-    use std::vec::IntoIter;
-    
-    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
-        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
-    }
 
     let args= extract_query_into_iter("program.exe arg1 arg2");
-    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+    let prompt = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
 
-    assert!(config.is_ok());
-    let config = config.expect("Cannot be None");
+    assert!(prompt.is_ok());
+    let prompt = prompt.expect("Cannot be None");
 
-    assert_eq!(config.program_name, "program.exe");
-    assert_eq!(config.arguments.is_some_and(|args| args.len() == 2), true);
-    assert!(config.parameters.is_none());
+    assert_eq!(prompt.program_name, "program.exe");
+    assert_eq!(prompt.arguments.is_some_and(|args| args.len() == 2), true);
+    assert!(prompt.parameters.is_none());
 }
 
 #[test]
 fn check_parameter() {
-    
-    use super::*;
-    use std::vec::IntoIter;
-    
-    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
-        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
-    }
 
     let args= extract_query_into_iter("program.exe -h");
-    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+    let prompt = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
 
-    assert!(config.is_ok());
-    let config = config.expect("Cannot be None");
+    assert!(prompt.is_ok());
+    let prompt = prompt.expect("Cannot be None");
 
-    assert_eq!(config.program_name, "program.exe");
-    assert!(config.arguments.is_none());
-    assert_eq!(config.parameters.is_some_and(|params| params.contains_key("-h")), true);
+    assert_eq!(prompt.program_name, "program.exe");
+    assert!(prompt.arguments.is_none());
+    assert_eq!(prompt.parameters.is_some_and(|params| params.contains_key("-h")), true);
 }
 
 #[test]
 fn check_two_parameters() {
-    
-    use super::*;
-    use std::vec::IntoIter;
-    
-    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
-        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
-    }
 
     let args= extract_query_into_iter("program.exe -h --test");
-    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+    let prompt = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
 
-    assert!(config.is_ok());
-    let config = config.expect("Cannot be None");
+    assert!(prompt.is_ok());
+    let prompt = prompt.expect("Cannot be None");
 
-    assert_eq!(config.program_name, "program.exe");
-    assert!(config.arguments.is_none());
-    assert_eq!(config.parameters.is_some_and(|params| params.len() == 2 && params.contains_key("--test")), true);
+    assert_eq!(prompt.program_name, "program.exe");
+    assert!(prompt.arguments.is_none());
+    assert_eq!(prompt.parameters.is_some_and(|params| params.len() == 2 && params.contains_key("--test")), true);
 }
 
 #[test]
 fn check_argument_parameters() {
-    
-    use super::*;
-    use std::vec::IntoIter;
-    
-    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
-        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
-    }
 
     let args= extract_query_into_iter("program.exe test -h --test");
-    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+    let prompt = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
 
-    assert!(config.is_ok());
-    let config = config.expect("Cannot be None");
+    assert!(prompt.is_ok());
+    let prompt = prompt.expect("Cannot be None");
 
-    assert_eq!(config.program_name, "program.exe");
-    assert_eq!(config.arguments.is_some_and(|args| args.len() == 1), true);
-    assert_eq!(config.parameters.is_some_and(|params| params.len() == 2 && params.contains_key("--test")), true);
+    assert_eq!(prompt.program_name, "program.exe");
+    assert_eq!(prompt.arguments.is_some_and(|args| args.len() == 1), true);
+    assert_eq!(prompt.parameters.is_some_and(|params| params.len() == 2 && params.contains_key("--test")), true);
 }
 
 #[test]
 fn check_parameter_with_arguments() {
-    
-    use super::*;
-    use std::vec::IntoIter;
-    
-    fn extract_query_into_iter(input: &str) -> IntoIter<String> {
-        input.split_whitespace().map(String::from).collect::<Vec<String>>().into_iter()
-    }
 
     let args= extract_query_into_iter("program.exe -h --test 1");
-    let config = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
+    let prompt = PromptExtractor::new(StdinServiceMock { is_terminal: true }).extract(args);
 
-    assert!(config.is_ok());
-    let config = config.expect("Cannot be None");
+    assert!(prompt.is_ok());
+    let prompt = prompt.expect("Cannot be None");
 
-    assert_eq!(config.program_name, "program.exe");
-    assert!(config.arguments.is_none());
-    assert_eq!(config.parameters.is_some_and(|params| params.len() == 2 && params.contains_key("--test") && params.get("--test").is_some_and(|param| param.len() == 1)), true);
+    assert_eq!(prompt.program_name, "program.exe");
+    assert!(prompt.arguments.is_none());
+    assert_eq!(prompt.parameters.is_some_and(|params| params.len() == 2 && params.contains_key("--test") && params.get("--test").is_some_and(|param| param.len() == 1)), true);
 }

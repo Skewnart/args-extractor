@@ -1,5 +1,7 @@
+mod prompt;
 mod extractor;
 mod stdin;
+mod service;
 
-pub use extractor::*;
-pub use stdin::*;
+pub use service::PromptService;
+pub use prompt::{Prompt, Parameters};
