@@ -1,6 +1,11 @@
 # Args Extractor
 
-
+[![latest version](https://img.shields.io/crates/v/args-extractor.svg)](https://crates.io/crates/args-extractor)
+[![build status](https://img.shields.io/github/actions/workflow/status/skewnart/args-extractor/ci.yml)](https://github.com/Skewnart/args-extractor/actions)
+[![dependency status](https://deps.rs/repo/github/skewnart/args-extractor/status.svg)](https://deps.rs/repo/github/skewnart/args-extractor)
+[![downloads](https://img.shields.io/crates/d/args-extractor.svg)](https://crates.io/crates/args-extractor)
+[![docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://docs.rs/args-extractor/latest/args_extractor)
+![license](https://img.shields.io/crates/l/args-extractor.svg)
 
 Extracting arguments from a command line (prompt) is much easier than ever !
 
