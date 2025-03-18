@@ -1,6 +1,14 @@
 [package]
-name = "args_extractor"
+name = "args-extractor"
 version = "0.1.0"
 edition = "2024"
+description = "Args command line extractor library for Rust applications"
+license = "GPL-3.0-or-later"
+keywords = ["commandline", "extractor", "args", "prompt", "cli"]
+categories = ["command-line-utilities"]
+readme = "README.md"
+authors = ["Skewnart"]
+repository = "https://github.com/skewnart/args-extractor" 
+homepage = "https://github.com/skewnart/args-extractor"
 
 [dependencies]
