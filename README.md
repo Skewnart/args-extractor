@@ -9,10 +9,10 @@ Extracting arguments from a command line (prompt) is much easier than ever !
 For this prompt : `echo "hello world" | ./your_program arg1 arg2 -i -f file.txt`
 
 PromptExtractor will extract :
-- program_name : "./your_program"
-- content_piped : Some("hello world\n")
-- arguments : Some(["arg1", "arg2"])
-- parameters: Some({"-i": [], "-f": ["file.txt"]})
+- program_name : `"./your_program"`
+- content_piped : `Some("hello world\n")`
+- arguments : `Some(["arg1", "arg2"])`
+- parameters: `Some({"-i": [], "-f": ["file.txt"]})`
 
 ``` rust
 use args_extractor::{Prompt, PromptExtractor};
