@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 pub type Parameters = HashMap<String, Vec<String>>;
 
+#[derive(Debug)]
 pub struct Prompt {
     pub program_name: String,
     pub content_piped: Option<String>,

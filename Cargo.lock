@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "args-extractor"
+name = "args_extractor"
 version = "0.1.0"
